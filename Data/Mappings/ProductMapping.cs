@@ -17,5 +17,6 @@ public class ProductMapping: IEntityTypeConfiguration<Product>
         builder.Property(p => p.Measurement).HasColumnName("Medida");
         builder.Property(p => p.Unit).HasColumnName("Unidade");
         builder.Property(p => p.Brand).HasColumnName("Marca");
+        builder.Property(p => p.Amount).HasColumnName("Quantidade");
     }
 }

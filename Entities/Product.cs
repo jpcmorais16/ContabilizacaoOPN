@@ -6,7 +6,7 @@ public class Product
     public string Name { get; set; }
     public float Price { get; set; }
     public float Measurement { get; set; }
-    public string Brand { get; set; }
+    public string? Brand { get; set; }
     public int Amount { get; set; }
     public Unit Unit { get; set;}
 }

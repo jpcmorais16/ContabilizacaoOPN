@@ -40,7 +40,7 @@ public class UserRepository
         var user = await _context.Users.Include(u => u.Events).FirstOrDefaultAsync(u => u.Idn == idn);
 
         if (user == null)
-            throw new Exception("Usuário não encontrado-");
+            throw new Exception("Usuário não encontrado");
 
         user.Events!.Add(new Event()
         {
@@ -49,7 +49,8 @@ public class UserRepository
             ProductCode = productCode,
             SupermarketId = supermarketId,
             ShiftId = shiftId, 
-            Amount = amount
+            Amount = amount,
+            Time = DateTime.UtcNow
         });
         
         await _context.SaveChangesAsync();

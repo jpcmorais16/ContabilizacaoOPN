@@ -14,6 +14,9 @@ public class EventMapping: IEntityTypeConfiguration<Event>
         builder.Property(p => p.Id).HasColumnName("Codigo");
         builder.Property(p => p.UserIdn).HasColumnName("Usuario_idn");
         builder.Property(p => p.Type).HasColumnName("Tipo");
+        builder.Property(p => p.ProductCode).HasColumnName("Produto_cb");
+        builder.Property(p => p.ShiftId).HasColumnName("Turno_id");
+        builder.Property(p => p.SupermarketId).HasColumnName("Supermercado_id");
         builder.Property(p => p.Amount).HasColumnName("Quantidade");
         builder.Property(p => p.Time).HasColumnName("Horario");
     }

@@ -5,3 +5,5 @@
 *.dll
 
 *.csproj
+
+apsettings.Production.json

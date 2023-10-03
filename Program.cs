@@ -1,4 +1,5 @@
 using Contabilizacao.Data;
+using Contabilizacao.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,23 @@ builder.Services.AddSingleton(provider =>
     var configuration = provider.GetService<IConfiguration>();
     return new ApplicationContext(configuration!.GetConnectionString("Default"));
 });
+// builder.Services.AddScoped(provider =>
+// {
+//     return new ProductRepository(provider.GetService<ApplicationContext>()!);
+// });
+
 builder.Services.AddScoped<ProductRepository>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<SupermarketRepository>();
+builder.Services.AddScoped<ProductService>();
+
+builder.Services.AddScoped(provider =>
+{
+    return new UserRepository(provider.GetService<ApplicationContext>()!);
+});
+
+builder.Services.AddScoped(provider =>
+{
+    return new SupermarketRepository(provider.GetService<ApplicationContext>()!);
+});
 
 builder.Services.AddCors(p => p.AddPolicy("corspolicy", build => 
 
@@ -28,11 +43,10 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
