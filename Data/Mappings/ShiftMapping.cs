@@ -8,7 +8,7 @@ public class ShiftMapping: IEntityTypeConfiguration<Shift>
 {
     public void Configure(EntityTypeBuilder<Shift> builder)
     {
-        builder.ToTable("Turno");
+        builder.ToTable("turno");
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Id).HasColumnName("Codigo");

@@ -1,9 +1,12 @@
 using Contabilizacao.Data;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contabilizacao.Controllers;
 
-[Route("User")]
+[EnableCors("corspolicy")]
+[ApiController]
+[Route("api/User")]
 public class UserController: ControllerBase
 {
     private readonly UserRepository _repository;

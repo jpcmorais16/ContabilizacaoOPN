@@ -1,5 +1,6 @@
 using Contabilizacao.Data;
 using Contabilizacao.Services;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,16 +11,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//builder.Services.AddScoped<ApplicationContext>();
 builder.Services.AddSingleton(provider =>
 {
     var configuration = provider.GetService<IConfiguration>();
     return new ApplicationContext(configuration!.GetConnectionString("Default"));
 });
-// builder.Services.AddScoped(provider =>
-// {
-//     return new ProductRepository(provider.GetService<ApplicationContext>()!);
-// });
+
 
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<ProductService>();
@@ -51,6 +48,23 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "text/plain";
+        var exceptionHandlerPathFeature =
+            context.Features.Get<IExceptionHandlerPathFeature>();
+        if (exceptionHandlerPathFeature?.Error != null)
+        {
+            await context.Response.WriteAsync(exceptionHandlerPathFeature.Error.Message);
+        }
+    });
+});
+
+app.UseCors("corspolicy");
 
 app.MapControllers();
 

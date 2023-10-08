@@ -8,7 +8,7 @@ public class SupermarketMapping: IEntityTypeConfiguration<Supermarket>
 {
     public void Configure(EntityTypeBuilder<Supermarket> builder)
     {
-        builder.ToTable("Supermercado");
+        builder.ToTable("supermercado");
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Id).HasColumnName("Codigo");

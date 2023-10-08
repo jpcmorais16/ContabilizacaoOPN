@@ -6,4 +6,9 @@
 
 *.csproj
 
-apsettings.Production.json
+appsettings.Production.json
+*.v2
+.vs/Nova Contabilizacao/v17/.suo
+*.v1
+*.lock
+*.vsidx

@@ -1,9 +1,12 @@
 using Contabilizacao.Data;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contabilizacao.Controllers;
 
-[Route("Supermarket")]
+[EnableCors("corspolicy")]
+[ApiController]
+[Route("api/Supermarket")]
 public class SupermarketController: ControllerBase
 {
     private readonly SupermarketRepository _repository;

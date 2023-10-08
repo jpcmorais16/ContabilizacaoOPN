@@ -1,11 +1,14 @@
 using Contabilizacao.Data;
 using Contabilizacao.Requests;
 using Contabilizacao.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contabilizacao.Controllers;
 
-[Route("Product")]
+[EnableCors("corspolicy")]
+[ApiController]
+[Route("api/product")]
 public class ProductController: ControllerBase
 {
     private readonly ProductRepository _productRepository;
@@ -20,7 +23,14 @@ public class ProductController: ControllerBase
     [HttpGet("Check")]
     public async Task<IActionResult> CheckProduct([FromQuery] string code)
     {
-        return Ok(await _productRepository.GetByCode(code));
+        var response = await _productRepository.GetByCode(code);
+
+        if (response == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(response);
     }
     
     [HttpPost("Add")]

@@ -8,7 +8,7 @@ public class ProductToSupermarketToShiftMapping: IEntityTypeConfiguration<Produc
 {
     public void Configure(EntityTypeBuilder<ProductToSupermarketToShift> builder)
     {
-        builder.ToTable("ProdutoToSupermercadoToTurno");
+        builder.ToTable("produtotosupermercadototurno");
         builder.HasKey(p => new { p.ProductCode, p.SupermarketId, p.ShiftId });
 
         builder.Property(p => p.ProductCode).HasColumnName("Produto_cb");

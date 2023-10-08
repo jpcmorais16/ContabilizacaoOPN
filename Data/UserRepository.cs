@@ -21,6 +21,9 @@ public class UserRepository
     
     public async Task<User> RegisterUser(string idn, string name)
     {
+        if (await _context.Users.AnyAsync(u => u.Idn == idn))
+            throw new Exception("Idn já cadastrado");
+            
         var user = new User(idn, name);
         
         await _context.Users.AddAsync(user);
@@ -32,6 +35,11 @@ public class UserRepository
 
     public async Task<List<Event>> GetUserHistory(string idn)
     {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Idn == idn);
+
+        if (user == null)
+            throw new Exception("Usuário não encontrado");
+        
         return await _context.Events.Where(e => e.UserIdn == idn).ToListAsync();
     }
 
