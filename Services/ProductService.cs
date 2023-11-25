@@ -21,7 +21,6 @@ public class ProductService
         {
             Code = request.Code,
             Name = request.Name,
-            Price = request.Price,
             Unit = request.Unit,
             Measurement = request.Measurement
         };
@@ -46,10 +45,18 @@ public class ProductService
             return entity;
         }
 
-        await _userRepository.AddEvent(request.AuthorIdn, EventType.Addition, request.ProductCode, request.ShiftId, request.SupermarketId, request.Amount);
-        
-        return await _productRepository.CreateEntity(request.ProductCode,
+        entity =  await _productRepository.CreateEntity(request.ProductCode,
             request.SupermarketId, request.ShiftId, request.Amount);
+
+        var product = await _productRepository.GetByCode(request.ProductCode);
+
+        product!.Amount += request.Amount;
+
+        await _productRepository.UpdateAsync();
+        
+        await _userRepository.AddEvent(request.AuthorIdn, EventType.Addition, request.ProductCode, request.ShiftId, request.SupermarketId, request.Amount);
+
+        return entity;
     }
 
     public async Task<Product?> EditProduct(EditProductRequest request)
@@ -61,11 +68,12 @@ public class ProductService
 
         product.Name = request.Name;
         product.Measurement = request.Measurement;
-        product.Brand = request.Brand;
-        product.Price = request.Price;
+        product.Brand = request.Brand ?? product.Brand;
         product.Unit = request.Unit;
 
+        
         await _productRepository.UpdateAsync();
+        _productRepository.ResetCache();
         await _userRepository.AddEvent(request.AuthorIdn, EventType.Edition, request.ProductCode);
 
         return product;

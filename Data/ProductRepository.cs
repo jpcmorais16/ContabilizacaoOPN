@@ -1,15 +1,24 @@
+using System.Runtime.InteropServices;
 using Contabilizacao.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Contabilizacao.Data;
 
 public class ProductRepository
 {
     private readonly ApplicationContext _context;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger<ProductRepository> _logger;
+    private List<string> _cacheKeyList;
+    private int _hits = 0;
     
-    public ProductRepository(ApplicationContext context)
+    public ProductRepository(ApplicationContext context, IMemoryCache cache, ILogger<ProductRepository> logger)
     {
+        _cache = cache;
         _context = context;
+        _logger = logger;
+        _cacheKeyList = new List<string>();
     }
 
     public async Task<Product?> GetByCode(string code)
@@ -19,19 +28,15 @@ public class ProductRepository
 
     public async Task Register(Product product)
     {
-        try
-        {
-            await _context.Products.AddAsync(product);
+        if (_context.Products.Any(p => p.Code == product.Code)) throw new Exception("Código de barras já cadastrado");
+        
+        await _context.Products.AddAsync(product);
+
+        await _context.SaveChangesAsync();
             
-            await _context.SaveChangesAsync();
-        }
-
-        catch
-        {
-            throw new Exception("Código de barras já cadastrado");
-        }
+        ResetCache();
     }
-
+    
     public async Task<ProductToSupermarketToShift?> GetEntityByCodeSupermarketAndShift(string productCode, int supermarketId, int shiftId)
     {
         return await _context.ProductsToSupermarketToShifts
@@ -71,5 +76,39 @@ public class ProductRepository
     public async Task UpdateAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Product>> GetByTerm(string term)
+    {
+        if (_cache.TryGetValue(term, out List<Product> results))
+        {
+            _hits += 1;
+            _logger.LogInformation($"Hits: {_hits}");
+            return results;
+        }
+        
+        results = await _context.Products
+            .Where(p => term.Length <= 2 ? p.Name.StartsWith(term) : p.Name.Contains(term)).ToListAsync();
+        
+        var cacheEntryOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        };
+
+        _cache.Set(term, results, cacheEntryOptions);
+        
+        _cacheKeyList.Add(term);
+
+        return results;
+    }
+
+    public void ResetCache()
+    {
+        foreach (var key in _cacheKeyList)
+        {
+            _cache.Remove(key);
+        }
+
+        _cacheKeyList = new List<string>();
     }
 }

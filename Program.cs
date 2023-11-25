@@ -11,14 +11,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddLogging(b => b.AddConsole());
+
 builder.Services.AddSingleton(provider =>
 {
     var configuration = provider.GetService<IConfiguration>();
     return new ApplicationContext(configuration!.GetConnectionString("Default"));
 });
 
+builder.Services.AddMemoryCache();
 
-builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddSingleton<ProductRepository>();
 builder.Services.AddScoped<ProductService>();
 
 builder.Services.AddScoped(provider =>

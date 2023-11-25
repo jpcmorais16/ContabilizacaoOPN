@@ -52,4 +52,10 @@ public class ProductController: ControllerBase
     {
         return Ok(await _service.EditProduct(request));
     }
+
+    [HttpGet("Search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string term)
+    {
+        return Ok(await _productRepository.GetByTerm(term));
+    }
 }
